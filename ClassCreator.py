@@ -16,6 +16,13 @@ def get_dotnet_type(sql_type):
 # Function to generate .NET class for a given table
 def generate_class(table_name, columns):
     class_lines = []
+    # Add necessary namespaces
+    class_lines.append("using System;")
+    class_lines.append("using System.ComponentModel.DataAnnotations;")
+    class_lines.append("using System.ComponentModel.DataAnnotations.Schema;")
+    class_lines.append("")  # Add an empty line for better readability
+    class_lines.append("namespace DataModels;")
+    class_lines.append("")  # Add an empty line for better readability
     class_lines.append(f"/// <summary>")
     class_lines.append(f"/// {table_name} table representation.")
     class_lines.append(f"/// </summary>")

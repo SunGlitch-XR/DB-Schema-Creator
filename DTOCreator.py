@@ -8,12 +8,28 @@ from ClassCreator import get_dotnet_type
 
 def generate_dto_class(table_name, columns):
     dto_lines = []
+    # Add necessary namespaces
+    dto_lines.append("using System.ComponentModel.DataAnnotations;")
+    dto_lines.append("using System.ComponentModel.DataAnnotations.Schema;")
+    dto_lines.append("")  # Add an empty line for better readability
+    dto_lines.append("namespace DTOs;")
+    dto_lines.append("")  # Add an empty line for better readability
     dto_lines.append(f"/// <summary>")
     dto_lines.append(f"/// {table_name} DTO representation.")
     dto_lines.append(f"/// </summary>")
     dto_lines.append(f"public class {table_name}DTO")
     dto_lines.append("{")
     for column in columns:
+        if column['is_nullable'] == 'NO':
+            dto_lines.append("    [Required]")
+        if column['data_type'] in ['nvarchar', 'varchar'] and 'max_length' in column:
+            dto_lines.append(f"    [StringLength({column['max_length']})]")
+        if column['is_primary_key'] == 'YES':
+            dto_lines.append("    [Key]")
+        if column['is_foreign_key'] == 'YES':
+            dto_lines.append(f"    [ForeignKey(\"{column['referenced_table_name']}\")]")
+        # Add more annotations based on the column properties as needed
+
         dto_lines.append(f"    /// <summary>")
         dto_lines.append(f"    /// {column['column_name']} field.")
         dto_lines.append(f"    /// </summary>")
@@ -22,6 +38,8 @@ def generate_dto_class(table_name, columns):
         dto_lines.append("")
     dto_lines.append("}")
     return "\n".join(dto_lines)
+
+
 
 
 def create_dtos_from_csv(csv_path):
