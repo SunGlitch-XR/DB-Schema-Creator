@@ -2,6 +2,8 @@ import pandas as pd
 from graphviz import Digraph
 import tkinter as tk
 from tkinter import filedialog
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 def read_csv(file_path):
     return pd.read_csv(file_path)
@@ -28,18 +30,29 @@ def create_graph(schema_df):
 def render_and_save(dot, output_path):
     dot.render(output_path, view=True)
 
+def write_error_to_pdf(error_message, output_path):
+    c = canvas.Canvas(output_path + "_error.pdf", pagesize=letter)
+    c.drawString(100, 750, "An error occurred:")
+    c.drawString(100, 730, error_message)
+    c.save()
+
 def select_csv_and_generate_pdf():
-    root = tk.Tk()
-    root.withdraw() # Hide the main window
-    csv_path = filedialog.askopenfilename(title="Select a CSV file", filetypes=[("CSV files", "*.csv")])
-    if csv_path:
-        schema_df = read_csv(csv_path)
-        dot = create_graph(schema_df)
-        output_path = csv_path.rsplit('.', 1)[0] # Remove the file extension
-        render_and_save(dot, output_path)
-        print("PDF generated successfully!")
-    else:
-        print("No CSV file selected.")
+    try:
+        root = tk.Tk()
+        root.withdraw() # Hide the main window
+        csv_path = filedialog.askopenfilename(title="Select a CSV file", filetypes=[("CSV files", "*.csv")])
+        if csv_path:
+            schema_df = read_csv(csv_path)
+            dot = create_graph(schema_df)
+            output_path = csv_path.rsplit('.', 1)[0] # Remove the file extension
+            render_and_save(dot, output_path)
+            print("PDF generated successfully!")
+        else:
+            print("No CSV file selected.")
+    except Exception as e:
+        error_message = str(e)
+        print("An error occurred:", error_message)
+        write_error_to_pdf(error_message, csv_path.rsplit('.', 1)[0])
 
 if __name__ == "__main__":
     select_csv_and_generate_pdf()
