@@ -6,7 +6,11 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 def read_csv(file_path):
-    return pd.read_csv(file_path)
+    df = pd.read_csv(file_path)
+    # Convert column names to lowercase to match your script expectations
+    df.columns = [col.lower() for col in df.columns]
+    return df
+
 
 def create_graph(schema_df):
     dot = Digraph('DatabaseSchema')
